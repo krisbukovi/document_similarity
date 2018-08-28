@@ -3,13 +3,21 @@
 # purpose: Given 2 PDF documents, calculate the document similarity using the Universal Sentence Encoder
 
 import io
-# import tensorflow_hub as hub
+import tensorflow as tf
+import tensorflow_hub as hub
+import matplotlib.pyplot as plt
+import numpy as np 
+import os 
+import pandas as pd 
+import re 
+import seaborn as sns 
 
 from pdfminer.converter import TextConverter
 from pdfminer.pdfinterp import PDFPageInterpreter
 from pdfminer.pdfinterp import PDFResourceManager
 from pdfminer.pdfpage import PDFPage
 from pdfminer.layout import LAParams
+from nltk.tokenize import sent_tokenize, word_tokenize
 
 class SimilarityMap:
 
@@ -72,27 +80,30 @@ class SimilarityMap:
             return txtList
 
     # clean data
-    def cleanData(self, text):
+    def cleanData(self, docList):
+
+        tempList = []
 
         # go through text split where ending puncutation occurs to obtain sentences, store in vector
-        for i in range(len(text)):
-            text[i] = text[i].split(". ")
-
+        for doc in docList:
+            tempList.append(sent_tokenize(doc))
+            
 
         # turn all letters in sentences to lower case
 
-        # return vector
+        # return list
+        return tempList
 
 
-    #def createVector(v):
+    def createVector(v):
 
         # create an Universal Sentence Encoder object 
-    #    embed = hub.Module("https://tfhub.dev/google/universal-sentence-encoder/1")
+        embed = hub.Module("https://tfhub.dev/google/universal-sentence-encoder/2")
+ 
+        for sentence in v:
+            embeddings = embed(v)
 
-        # 
-    #    embeddings = embed(v)
-
-    #    print session.run(embeddings)
+        print session.run(embeddings)
 
 
 
@@ -105,14 +116,20 @@ class SimilarityMap:
 if __name__ == '__main__':
 
     # create list to store file paths for all PDFs
-    paths = []
+    paths = ["Don't cry because it's over, smile because it happened. Be yourself; everyone else is already taken. You know you're in love when you can't fall asleep because reality is finally better than your dreams."]
 
     # get path to first file
-    paths.append(str(input("Please enter the path for first file: ")))
+    #paths.append(str(input("Please enter the path for first file: ")))
 
     simMap = SimilarityMap(paths)
 
-    simMap.pdf2txt(len(paths))
+    # simMap.pdf2txt(len(paths))
+
+    print(paths)
+
+    print(simMap.cleanData(paths))
+
+
 
 
 
